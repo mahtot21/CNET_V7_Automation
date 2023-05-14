@@ -1,7 +1,7 @@
 import pyodbc
 
 
-def find_schema(table_name: str, server_name: str = 'DESKTOP-9GKJ3L7\CNET_V7', database_name: str = 'test_v7', username: str = 'sa', password: str = 'rdpass') -> str:
+def find_schema(table_name: str, server_name: str = 'DESKTOP-9GKJ3L7\CNET_V7', database_name: str = 'CNET_V7_DB', username: str = 'sa', password: str = 'rdpass') -> str:
     """
     Returns the schema of the specified table if it exists, or -1 if it does not.
 
