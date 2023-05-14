@@ -6,7 +6,7 @@ model_path = r"D:\LAB\CNET\CNET_V7\CNET_V7_Entities\DataModels"
 
 create_irepository_root_path = r"C:\Users\mahto\Desktop\test"
 create_iservice_root_path = r"C:\Users\mahto\Desktop\test"
-create_dto_root_path = r'D:\LAB\Mahtot\test'
+created_dto_root_path = r'D:\LAB\Mahtot\test'
 
 irepository_manager_create_path = r'C:\Users\mahto\Desktop\test\IRepositoryManager.cs'
 repository_manager_create_path = r'C:\Users\mahto\Desktop\test\RepositoryManager.cs'
@@ -24,7 +24,7 @@ mapping_file_path = r'C:\Users\mahto\Desktop\test\MappingProfile.cs'
 
 # create_iservice_root_path = r"C:\Users\mahto\OneDrive\Documents\MAIN LAB\V7\CNET_V7_Service.Contracts"
 
-# create_dto_root_path = r'C:\Users\mahto\OneDrive\Documents\MAIN LAB\V7\CNET_V7_Domain\Domain'
+# created_dto_root_path = r'C:\Users\mahto\OneDrive\Documents\MAIN LAB\V7\CNET_V7_Domain\Domain'
 
 # irepository_manager_create_path = r'C:\Users\mahto\OneDrive\Documents\MAIN LAB\V7\CNET_V7_Repository.Contracts\IRepositoryManager.cs'
 
@@ -42,7 +42,7 @@ mapping_file_path = r'C:\Users\mahto\Desktop\test\MappingProfile.cs'
 
 if __name__ == '__main__':
 
-    create_dto(model_path, create_dto_root_path)
+    create_dto(model_path, created_dto_root_path)
 
     # create_irepositories(model_path, create_irepository_root_path)
 
