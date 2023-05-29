@@ -1,6 +1,16 @@
-from Automate import create_dto, create_irepositories, create_irepository_manager, create_irepository_implementation, \
-    create_repository_manager, create_iservice_manager, create_iservice, create_service_manager, \
-    create_iservice_implementation, create_controllers, configure_mapping
+from Automate import (
+    create_dto, 
+    create_irepositories, 
+    create_irepository_manager, 
+    create_irepository_implementation,
+    create_repository_manager,
+    create_iservice_manager, 
+    create_iservice, 
+    create_service_manager, 
+    create_iservice_implementation, 
+    create_controllers, 
+    configure_mapping
+    )
 
 model_path = r"C:\Users\Admin\Desktop\test\DataModels\DataModels"
 
