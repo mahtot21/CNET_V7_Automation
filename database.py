@@ -19,6 +19,14 @@ def find_schema(table_name: str, server_name: str = 'DESKTOP-9GKJ3L7\CNET_V7', d
     # for tables range and delegate the table have 's' at the end so we should return like this for the cnetmedium for unknowingly entity framework scaffold like this
     if table_name.lower() in ['cnetmedium', 'range', 'delegate']:
         return 'Common'
+    if table_name.lower() in ['roomfeature', 'vouchervalue', 'ratecodepackage', 'weekday']:
+        table_name = f'{table_name}s'
+    if table_name.lower() in ['medium']:
+        table_name = 'Media'
+    if table_name.lower() in ['registratordetail']:
+        return 'Pms'
+    if 'Vw' in table_name:
+        return 'View'
 
     # Set up connection string
     connection_string = f"DRIVER={{SQL Server}};SERVER={server_name};DATABASE={database_name};UID={username};PWD={password}"
