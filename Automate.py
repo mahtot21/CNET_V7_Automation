@@ -3,44 +3,98 @@ from database import find_schema
 
 
 def create_dto(model_path_dir: str, dto_root_path: str):
-    for root, dirs, files in os.walk(model_path_dir):
-        # print(f"length of files: {len(files)}")
-        for file in files:
+    """
+    Create DTOs (Data Transfer Objects) for each file in the model path directory.
 
-            with open(os.path.join(root, file)) as domain_file:
+    Args:
+        model_path_dir (str): Directory path where the model files are located.
+        dto_root_path (str): Root directory path where the DTOs will be created.
+
+    Returns:
+        None
+    """
+    for root, _, files in os.walk(model_path_dir):
+        # Walk through the directory tree starting from 'model_path_dir'
+        # 'root' represents the current directory being traversed
+        # '_' is used to ignore the subdirectories since they are not used in this code
+        # 'files' contains a list of file names in the current directory
+        for file in files:
+            # Iterate through each file in the current directory
+            file_path = os.path.join(root, file)
+            # Construct the absolute file path by joining 'root' and 'file'
+
+            with open(file_path) as domain_file:
+                # Open the file for reading
                 filename, file_extension = os.path.splitext(file)
+                # Split the file name and extension
+                # 'filename' stores the name of the file without the extension
+                # 'file_extension' stores the extension of the file
+
                 dto_name = filename + 'DTO' + file_extension
+                # Generate the name for the DTO by appending 'DTO' to the original file name
 
                 schema = find_schema(filename)
+                # Call the 'find_schema' function to get the schema associated with the file
+                # The 'filename' is passed as an argument to the function
+
                 if schema == -1:
-                    print('file name: ', filename, ', schema: ', schema)
+                    # If the schema is not found (indicated by -1),
+                    # print a message and skip the current file
+                    print(f"Skipping file: {filename}. No schema found.")
                     continue
 
-                if not os.path.exists(os.path.join(dto_root_path, schema)):
-                    os.mkdir(os.path.join(dto_root_path, schema))
+                schema_path = os.path.join(dto_root_path, schema)
+                # Construct the path where the DTO file should be created
+                # by joining 'dto_root_path' and 'schema'
 
-                with open(os.path.join(dto_root_path, schema, dto_name), 'w+') as dto_file:
+                if not os.path.exists(schema_path):
+                    # If the schema path doesn't exist, create the directory
+                    os.mkdir(schema_path)
+
+                dto_file_path = os.path.join(schema_path, dto_name)
+                # Construct the path for the DTO file by joining 'schema_path' and 'dto_name'
+
+                with open(dto_file_path, 'w+') as dto_file:
+                    # Open the DTO file for writing (create if it doesn't exist, truncate if it does)
                     for line in domain_file:
+                        # Iterate through each line in the original file
                         if "namespace" in line:
+                            # If the line contains "namespace",
+                            # modify the line to include the schema in the namespace declaration
                             line = f"namespace CNET_V7_Domain.Domain.{schema}Schema;\n"
-                        if "class" in line:
+                        elif "class" in line:
+                            # If the line contains "class",
+                            # modify the line to change the class name by appending 'DTO' to it
                             line = line.split('\n')[:-1][0] + 'DTO'
-                        if "virtual" in line:
-                            continue
-                        if line.isspace():
+                        elif "virtual" in line or line.isspace():
+                            # If the line contains "virtual" or is empty (whitespace),
+                            # skip the line and continue to the next iteration
                             continue
                         dto_file.write(line)
-    print(f"All DTOS Created")
+                        # Write the modified or unmodified line to the DTO file
+
+    print("All DTOS created.")
 
 
-def create_irepositories(model_path_dir: str, irepository_path_dir):
-    irepository_sample = '''using CNET_V7_Entities.DataModels;
+def create_irepositories(model_path_dir: str, irepository_path_dir: str):
+    """
+    Create IRepository interfaces for each model file in the model path directory.
+
+    Args:
+        model_path_dir (str): Directory path where the model files are located.
+        irepository_path_dir (str): Directory path where the IRepository files will be created.
+
+    Returns:
+        None
+    """
+
+    IREPOSITORY_SAMPLE = '''using CNET_V7_Entities.DataModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+s
 namespace CNET_V7_Repository.Contracts.SchemaNameSchema
 {
     public interface IEntityNameRepository : IRepository<SafeName>
@@ -48,31 +102,58 @@ namespace CNET_V7_Repository.Contracts.SchemaNameSchema
 
     }
 }
-    '''
-    schema = 'NotFound'
+'''
 
     for root, dirs, files in os.walk(model_path_dir):
+        # Walk through the directory tree starting from 'model_path_dir'
         filenames = [os.path.splitext(file)[0] for file in files]
-        # print(filenames)
+        # Extract the file names without extensions using list comprehension
+
         for name in filenames:
+            # Iterate through each file name
             schema = find_schema(name)
-            if(schema.lower() != "view"):
-                if not os.path.exists(os.path.join(irepository_path_dir, schema)):
-                    os.mkdir(os.path.join(irepository_path_dir, schema))
+            # Call the 'find_schema' function to get the schema associated with the file
+
+            if schema == -1:
+                # If the schema is not found (indicated by -1),
+                # print a message and skip the current file
+                print(f"Skipping file: {name}. No schema found.")
+                continue
+
+            if schema.lower() != "view":
+                # Skip processing if the schema is "view" (case-insensitive)
+                schema_dir = os.path.join(irepository_path_dir, schema)
+                if not os.path.exists(schema_dir):
+                    # If the schema path doesn't exist, create the directory
+                    os.mkdir(schema_dir)
 
                 repo_name = 'I' + name + 'Repository'
-                with open(os.path.join(irepository_path_dir, schema, repo_name + '.cs'), 'w+') as file:
-                    # let me replace it
-                    safe_model_name = name
-                    if name.lower() in ['delegate', 'range', 'route']:
-                        safe_model_name = f'CNET_V7_Entities.DataModels.{name}'
+                # Construct the IRepository file name by appending 'I' to the model name and 'Repository' to the end
 
-                    file.write(irepository_sample.replace('EntityName', name).replace('SchemaName', schema).replace(
-                    'SafeName', safe_model_name))
-    print(" All Irepository Files Are Created")
+                irepository_file_path = os.path.join(schema_dir, repo_name + '.cs')
+                with open(irepository_file_path, 'w+') as file:
+                    # Open the IRepository file for writing (create if it doesn't exist, truncate if it does)
+                    safe_model_name = safe_model_name(name)
+
+                    irepository_content = IREPOSITORY_SAMPLE.replace('EntityName', name).replace('SchemaName', schema).replace('SafeName', safe_model_name)
+                    file.write(irepository_content)
+                    # Replace placeholders in the IRepository sample code with actual names
+
+    print("All IRepository Files Are Created.")
 
 
-def create_irepository_manager(model_path_dir: str, irepository_manger_file_path: str):
+def create_irepository_manager(model_path_dir: str, irepository_manager_file_path: str):
+    """
+    Create IRepositoryManager interface for the model files in the given directory.
+
+    Args:
+        model_path_dir (str): Directory path where the model files are located.
+        irepository_manager_file_path (str): File path where the IRepositoryManager file will be created.
+
+    Returns:
+        None
+    """
+    # Define the sample code for IRepositoryManager interface
     implementation_sample = '''THE_USING_STATEMENT
 using System;
 using System.Collections.Generic;
@@ -85,36 +166,62 @@ namespace CNET_V7_Repository.Contracts
     public interface IRepositoryManager
     {
         Task<IDbContextTransaction> StartTransaction();
-
         void Save();
         THE_DECLARATION
     }
 }
     '''
-    using_statement = ''
+
+    # Initialize lists to store using statements and the IRepository declarations
+    using_statements = []
     the_declaration = ''
-    using_printed_schemas = []
-    with open(irepository_manger_file_path, 'w+') as manager:
-        for root, dirs, files in os.walk(model_path_dir):
-            
-            for file in files:
-                model_name, file_extension = os.path.splitext(file)
-                if(find_schema(model_name).lower() != 'view'):
-                    the_declaration += f'\n\t\tI{model_name}Repository {model_name} ' + '{ get; }\n'
 
-                    if find_schema(model_name) not in using_printed_schemas:
-                        using_printed_schemas.append(find_schema(model_name))
-                        using_statement += f'using CNET_V7_Repository.Contracts.{find_schema(model_name)}Schema;\n'
+    # Iterate through the files in the specified directory
+    for root, dirs, files in os.walk(model_path_dir):
+        for file in files:
+            # Extract the model name and file extension
+            model_name, file_extension = os.path.splitext(file)
+            # Find the schema associated with the model
+            schema = find_schema(model_name)
 
-            manager.write(
-                implementation_sample.replace('THE_USING_STATEMENT', using_statement).replace('THE_DECLARATION',
-                                                                                              the_declaration))
+            if schema == -1:
+                # If the schema is not found (indicated by -1),
+                # print a message and skip the current file
+                print(f"Skipping file: {model_name}. No schema found.")
+                continue
 
-    print(f"Irepository manager created")
+            if schema.lower() != 'view':
+                # Generate the IRepository declaration for the model
+                the_declaration += f'\n\t\tI{model_name}Repository {model_name} ' + '{{ get; }}\n'
+
+                if schema not in using_statements:
+                    # Add the schema to the list of using statements if it hasn't been added already
+                    using_statements.append(schema)
+
+    # Generate the using statements by joining the schema names
+    using_statement = '\n'.join([f'using CNET_V7_Repository.Contracts.{schema}Schema;' for schema in using_statements])
+
+    # Write the IRepositoryManager code to the specified file path
+    with open(irepository_manager_file_path, 'w+') as manager:
+        manager.write(
+            implementation_sample.replace('THE_USING_STATEMENT', using_statement).replace('THE_DECLARATION',
+                                                                                          the_declaration))
+
+    print(f"IRepositoryManager created.")
 
 
 def create_irepository_implementation(model_path_dir: str, irepository_implementation_root: str):
-    implementation_sample = '''using CNET_V7_Repository.Contracts;
+    """
+    Create IRepository implementation files for the model files in the given directory.
+
+    Args:
+        model_path_dir (str): Directory path where the model files are located.
+        irepository_implementation_root (str): Root directory path where the IRepository implementation files will be created.
+
+    Returns:
+        None
+    """
+    implementation_template = '''using CNET_V7_Repository.Contracts;
 using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;
@@ -136,29 +243,44 @@ namespace CNET_V7_Repository.Implementation.SCHEMA_NAMESchema
     }
 }
 
-        '''
+'''
 
+    # Walk through the directory tree starting from the model path directory
     for root, dirs, files in os.walk(model_path_dir):
+        # Get the filenames without extension
         filenames = [os.path.splitext(file)[0] for file in files]
-        # print(filenames)
-        for name in filenames:
-            schema = find_schema(name)
-            if(schema.lower() != "view"):
-                if not os.path.exists(os.path.join(irepository_implementation_root, schema)):
-                    os.mkdir(os.path.join(irepository_implementation_root, schema))
 
-                # repo_name = 'I' + name + 'Repository'
-                with open(os.path.join(irepository_implementation_root, schema, name + 'Repository.cs'), 'w+') as file:
-                    # let me replace it
-                    safe_model_name = name
-                    if name.lower() in ['delegate', 'range', 'route']:
-                        safe_model_name = f'CNET_V7_Entities.DataModels.{name}'
+        # Process each filename
+        for filename in filenames:
+            # Find the schema for the current filename
+            schema = find_schema(filename)
+
+            if schema == -1:
+                # If the schema is not found (indicated by -1),
+                # print a message and skip the current file
+                print(f"Skipping file: {filename}. No schema found.")
+                continue
+
+            if schema.lower() != "view":
+                # Create the schema directory if it doesn't exist
+                schema_directory = os.path.join(irepository_implementation_root, schema)
+                if not os.path.exists(schema_directory):
+                    os.makedirs(schema_directory)
+
+                # Generate the repository file path
+                repository_filepath = os.path.join(schema_directory, filename + 'Repository.cs')
+
+                # Open the repository file in write mode
+                with open(repository_filepath, 'w+') as file:
+                    # Replace placeholders in the implementation template and write to the file
+                    safe_model_name = safe_model_name(filename)
 
                     file.write(
-                        implementation_sample.replace('SAFE_MODEL_NAME', safe_model_name).replace('MODEL_NAME',
-                                                                                                name).replace(
-                            "SCHEMA_NAME", schema))
-    print(" All Repository Implementation Files Are Created")
+                        implementation_template.replace('SAFE_MODEL_NAME', safe_model_name)
+                        .replace('MODEL_NAME', filename)
+                        .replace("SCHEMA_NAME", schema))
+
+    print("All Repository Implementation Files Are Created")
 
 
 def create_repository_manager(model_path_dir: str, repository_manager_file_path: str):
@@ -176,7 +298,6 @@ namespace CNET_V7_Repository.Implementation
     public class RepositoryManager : IRepositoryManager
     {
         private readonly CnetV7DbContext _repositoryContext;
-
         THE_LAZY_DECLARATION
 
         public RepositoryManager(CnetV7DbContext repositoryContext)
@@ -195,32 +316,42 @@ namespace CNET_V7_Repository.Implementation
     }
 }
     '''
-    the_using_statement = ''
+
+    using_statements = []
     the_lazy_declaration = ''
     the_lazy_ctor = ''
     the_lazy_instantiation = ''
 
-    using_printed_schemas = []
     with open(repository_manager_file_path, 'w+') as repository_manager:
         for root, dirs, files in os.walk(model_path_dir):
             for file in files:
                 model_name, file_extension = os.path.splitext(file)
                 schema = find_schema(model_name)
-                if(schema.lower() != 'view'):
-                    if schema not in using_printed_schemas:
-                        using_printed_schemas.append(schema)
-                        the_using_statement += f'using CNET_V7_Repository.Contracts.{schema}Schema;\nusing CNET_V7_Repository.Implementation.{schema}Schema;\n'
-                    if schema == -1:
-                        print("schema not found: ", model_name)
 
-                    the_lazy_declaration += f'\n\t\tprivate readonly Lazy<I{model_name}Repository> _{model_name[0].lower() + model_name[1:]}Repository;'
-                    the_lazy_ctor += f'\n\t\t\t_{model_name[0].lower() + model_name[1:]}Repository = new Lazy<I{model_name}Repository>(()=>new {model_name}Repository(repositoryContext));'
-                    the_lazy_instantiation += f'\n\t\tpublic I{model_name}Repository {model_name} => _{model_name[0].lower() + model_name[1:]}Repository.Value;'
-        final_design = repository_manager_design.replace('THE_USING_STATEMENT', the_using_statement).replace(
+                if schema == -1:
+                    print(f"Skipping file: {file}. No schema found.")
+                    continue
+
+                if schema.lower() != 'view':
+                    if schema not in using_statements:
+                        using_statements.append(schema)
+
+                    lazy_property_name = f'_{model_name[0].lower() + model_name[1:]}Repository'
+                    the_lazy_declaration += f'\n\t\tprivate readonly Lazy<I{model_name}Repository> {lazy_property_name};'
+                    the_lazy_ctor += f'\n\t\t\t{lazy_property_name} = new Lazy<I{model_name}Repository>(() => new {model_name}Repository(repositoryContext));'
+                    the_lazy_instantiation += f'\n\t\tpublic I{model_name}Repository {model_name} => {lazy_property_name}.Value;'
+
+        # Generate the using statements by joining the schema names
+        using_statement = '\n'.join(
+            [f'using CNET_V7_Repository.Contracts.{schema}Schema;' for schema in using_statements])
+
+        final_design = repository_manager_design.replace('THE_USING_STATEMENT', using_statement).replace(
             'THE_LAZY_DECLARATION', the_lazy_declaration).replace('THE_LAZY_CTOR', the_lazy_ctor).replace(
             'THE_LAZY_INSTANTIATION', the_lazy_instantiation)
+
         repository_manager.write(final_design)
-    print(f"Repository manager created")
+
+    print("Repository manager created")
 
 
 def create_iservice_manager(model_path_dir: str, iservice_manager_file_path: str):
@@ -630,6 +761,12 @@ public class MODEL_NAMEController : ControllerBase
         for model_name in filenames:
             schema = find_schema(model_name)
 
+            if schema == -1:
+                # If the schema is not found (indicated by -1),
+                # print a message and skip the current file
+                print(f"Skipping file: {model_name}. No schema found.")
+                continue
+
             if not os.path.exists(os.path.join(controller_root, schema)):
                 os.mkdir(os.path.join(controller_root, schema))
 
@@ -662,6 +799,13 @@ public class MODEL_NAMEController : ControllerBase
 
 
 def configure_mapping(model_path_dir: str, mapping_file_path: str):
+    """
+    Configure AutoMapper mappings based on the models found in the specified directory.
+
+    Args:
+        model_path_dir (str): The directory path where the model files are located.
+        mapping_file_path (str): The file path to write the mapping configuration.
+    """
     mapping_init = '''using AutoMapper;
 THE_USING_STATEMENT
 using CNET_V7_Entities.DataModels;
@@ -671,32 +815,56 @@ namespace CNET_V7_API.MappingProfile
     public class MappingProfile : Profile
     {
         public MappingProfile() {
-            CreateMap<Account, AccountDTO>().ReverseMap();
-THE_CONFIGURATION
+            THE_CONFIGURATION
         } 
     }
 }
+'''
 
-        '''
-    the_using_statement = ''
+    using_statements = []
     the_configuration = ''
-    using_printed_schemas = []
-    with open(mapping_file_path, 'w+') as mapping_file:
-        for _, _, files in os.walk(model_path_dir):
-            for file in files:
-                model_name, _ = os.path.splitext(file)
-                if find_schema(model_name) not in using_printed_schemas:
-                    using_printed_schemas.append(find_schema(model_name))
-                    the_using_statement += f'using CNET_V7_Domain.Domain.{find_schema(model_name)}Schema;\n'
-                the_configuration += f'\t\t\tCreateMap<{safe_model_name(model_name)}, {model_name}DTO>().ReverseMap();\n'
 
+    # Generate the using statements and configuration for each model
+    for _, _, files in os.walk(model_path_dir):
+        for file in files:
+            model_name, _ = os.path.splitext(file)
+            schema_name = find_schema(model_name)
+
+            if schema_name not in using_statements:
+                using_statements.append(schema_name)
+
+            the_configuration += f'\t\t\tCreateMap<{safe_model_name(model_name)}, {model_name}DTO>().ReverseMap();\n'
+
+    # Generate the using statements by joining the schema names
+    using_statement = '\n'.join([f'using CNET_V7_Repository.Contracts.{schema}Schema;' for schema in using_statements])
+
+    # Write the mapping configuration to the file
+    with open(mapping_file_path, 'w+') as mapping_file:
         mapping_file.write(
-            mapping_init.replace('THE_USING_STATEMENT', the_using_statement).replace('THE_CONFIGURATION',
-                                                                                     the_configuration))
+            mapping_init.replace('THE_USING_STATEMENT', using_statement)
+            .replace('THE_CONFIGURATION', the_configuration)
+        )
+
     print("Mapping.cs file created.")
 
 
-def safe_model_name(model_name: str):
+def safe_model_name(model_name: str) -> str:
+    """
+    Modifies the given model name to ensure it is a safe choice.
+
+    Args:
+        model_name (str): The name of the model to be modified.
+
+    Returns:
+        str: The modified model name.
+
+    """
     if model_name.lower() in ['delegate', 'range', 'route']:
+        # If the model_name is one of the restricted keywords,
+        # prepend it with 'CNET_V7_Entities.DataModels.'
         return f'CNET_V7_Entities.DataModels.{model_name}'
+
+    # If the model_name is not a restricted keyword,
+    # return it as is.
     return model_name
+
