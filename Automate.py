@@ -620,8 +620,6 @@ namespace CNET_V7_Service.Implementation.SCHEMA_NAMESchema
                                                    safe_model_name(name)[0].lower() + safe_model_name(name)[1:]))
     print(" All Service Implementation Files Are Created")
 
-# todo: unwanted endpoints in the view controllers like transaction_view!
-
 
 def create_controllers(model_path_dir: str, controller_root: str):
     implementation_sample = '''using CNET_V7_Domain.Domain.SCHEMASchema;
