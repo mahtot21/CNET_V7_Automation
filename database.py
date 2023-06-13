@@ -34,7 +34,7 @@ def find_schema(table_name: str, server_name: str = 'DESKTOP-9GKJ3L7\CNET_V7', d
         return 'Pms'
 
     # If the table name contains 'Vw', return 'View'
-    if 'Vw' in table_name:
+    if 'Vw' in table_name or "View" in table_name:
         return 'View'
 
     # Set up the connection string

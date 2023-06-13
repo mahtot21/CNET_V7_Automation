@@ -41,7 +41,7 @@ public class MODEL_NAMEController : ControllerBase
     [HttpGet("filter")]
     public async Task<IActionResult> GetMODEL_NAMEByCondition([FromQuery] Dictionary<string, string> queryParameters)
     {
-        var response = await _commonService.FindByCondition(queryParameters, trackChanges: false);
+        var response = await _commonService.FindByConditionView(queryParameters, trackChanges: false);
         if (response.Success)
             return Ok(response.Data);
         return BadRequest(response.Message);

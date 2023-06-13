@@ -538,11 +538,11 @@ def generate_mapping_configuration(model_path_dir: str, mapping_file_path: str =
             for file in files:
                 model_name, _ = os.path.splitext(file)
                 schema_name = find_schema(model_name)
+                if schema_name != "View":
+                    if schema_name not in using_statements:
+                        using_statements.append(schema_name)
 
-                if schema_name not in using_statements:
-                    using_statements.append(schema_name)
-
-                the_configuration += f'\t\t\tCreateMap<{safe_model_name(model_name)}, {model_name}DTO>().ReverseMap();\n'
+                    the_configuration += f'\t\t\tCreateMap<{safe_model_name(model_name)}, {model_name}DTO>().ReverseMap();\n'
 
         # Generate the using statements by joining the schema names
         using_statement = '\n'.join([f'using CNET_V7_Domain.Domain.{schema}Schema;' for schema in using_statements])
