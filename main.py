@@ -45,10 +45,10 @@ def main():
     # generate_service_manager(model_path)
 
     # Generate Controllers
-    # generate_controllers(model_path, r"D:\LAB\CNET\CNET_V7\CNET_V7_Presentation\BaseControllers")
+    generate_controllers(model_path, r"D:\LAB\CNET\CNET_V7\CNET_V7_Presentation\BaseControllers")
 
     # Configure mapping
-    generate_mapping_configuration(model_path)
+    # generate_mapping_configuration(model_path)
 
 
 if __name__ == '__main__':
