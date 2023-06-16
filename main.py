@@ -15,10 +15,11 @@ from Automate import (
 
 def main():
     # you should change this file path to your data models root folder!
-    model_path = r"D:\LAB\CNET\CNET_V7\CNET_V7_Entities\DataModels"
+    model_path = r"D:\LAB\CNET\cnet_v7\CNET_V7_Entities\DataModels"
+    test_model_path = r"C:\Users\Admin\Desktop\Generated\DataModels\DataModels"
 
     # Generate DTO files
-    # generate_dto_files(model_path, r"D:\LAB\CNET\CNET_V7\CNET_V7_Domain\Domain")
+    # generate_dto_files(model_path, r'D:\LAB\CNET\cnet_v7\CNET_V7_Domain\Domain')
 
     # Generate IRepository files
     # generate_i_repository_files(model_path)
@@ -45,10 +46,12 @@ def main():
     # generate_service_manager(model_path)
 
     # Generate Controllers
-    # generate_controllers(model_path, r"D:\LAB\CNET\CNET_V7\CNET_V7_Presentation\BaseControllers")
+    generate_controllers(model_path, r"D:\LAB\CNET\CNET_V7\CNET_V7_Presentation\BaseControllers")
 
     # Configure mapping
-    generate_mapping_configuration(model_path)
+    # generate_mapping_configuration(model_path, r'D:\LAB\CNET\cnet_v7\CNET_V7_API\MappingProfile')
+
+    # generate_mapping_configuration(test_model_path)
 
 
 if __name__ == '__main__':

@@ -14,28 +14,11 @@ namespace CNET_V7_Presentation.BaseControllers.SCHEMASchema;
 [ApiController]
 public class MODEL_NAMEController : ControllerBase
 {
-    private readonly IService<SAFE_MODEL_NAME, MODEL_NAMEDTO> _commonService;
+    private readonly IService<SAFE_MODEL_NAME, MODEL_NAME> _commonService;
 
-    public MODEL_NAMEController(IService<SAFE_MODEL_NAME, MODEL_NAMEDTO> commonService)
+    public MODEL_NAMEController(IService<SAFE_MODEL_NAME, MODEL_NAME> commonService)
     {
         _commonService = commonService;
-    }
-
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetMODEL_NAMEById(int id)
-    {
-        var response = await _commonService.FindById(id);
-        if (response.Success) return Ok(response.Data);
-        return BadRequest(response.Ex.ToString());
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> GetAllMODEL_NAMEs()
-    {
-        var response = await _commonService.FindAll(trackChanges: false);
-        if(response.Success)
-            return Ok(response.Data);
-        return BadRequest(response.Message);
     }
 
     [HttpGet("filter")]
