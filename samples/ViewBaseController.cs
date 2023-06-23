@@ -21,6 +21,15 @@ public class MODEL_NAMEController : ControllerBase
         _commonService = commonService;
     }
 
+    [HttpGet("dynamic")]
+    public virtual async Task<IActionResult> GetRequiredMODEL_NAMEFields([FromQuery] Dictionary<string, string> queryParameters)
+    {
+        var response = await _commonService.GetDynamicRequiredView<View>(queryParameters);
+        if (response.Success)
+            return Ok(response.Data);
+        return BadRequest(response.Message);
+    }
+
     [HttpGet("filter")]
     public async Task<IActionResult> GetMODEL_NAMEByCondition([FromQuery] Dictionary<string, string> queryParameters)
     {

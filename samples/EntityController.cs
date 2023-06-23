@@ -21,19 +21,11 @@ public class MODEL_NAMEController : ControllerBase
         _commonService = commonService;
     }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetMODEL_NAMEById(int id)
+    [HttpGet("dynamic")]
+    public virtual async Task<IActionResult> GetDynamicRequiredMODEL_NAMEFields([FromQuery] Dictionary<string, string> queryParameters)
     {
-        var response = await _commonService.FindById(id);
-        if (response.Success) return Ok(response.Data);
-        return BadRequest(response.Ex.ToString());
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> GetAllMODEL_NAMEs()
-    {
-        var response = await _commonService.FindAll(trackChanges: false);
-        if(response.Success)
+        var response = await _commonService.GetDynamicRequiredView<SAFE_MODEL_NAME>(queryParameters);
+        if (response.Success)
             return Ok(response.Data);
         return BadRequest(response.Message);
     }
