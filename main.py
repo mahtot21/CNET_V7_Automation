@@ -49,9 +49,7 @@ def main():
     generate_controllers(model_path, r"D:\LAB\CNET\CNET_V7\CNET_V7_Presentation\BaseControllers")
 
     # Configure mapping
-    # generate_mapping_configuration(model_path, r'D:\LAB\CNET\cnet_v7\CNET_V7_API\MappingProfile')
-
-    # generate_mapping_configuration(test_model_path)
+    # generate_mapping_configuration(model_path)
 
 
 if __name__ == '__main__':

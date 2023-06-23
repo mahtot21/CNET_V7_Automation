@@ -458,7 +458,10 @@ def generate_service_implementation_files(model_path_dir: str, service_implement
 
 
 def generate_controllers(model_path_dir: str, controller_root: str = None):
-    entity_controller_implementation_sample = read_sample_code("EntityController.cs")
+    # entity_controller_implementation_sample = read_sample_code("EntityController.cs")
+    entity_controller_implementation_sample = read_sample_code("AbstractController.cs")
+
+    # view_controller_implementation_sample = read_sample_code("ViewController.cs")
     view_controller_implementation_sample = read_sample_code("ViewController.cs")
 
     if entity_controller_implementation_sample == -1 or view_controller_implementation_sample == -1:
@@ -508,7 +511,7 @@ def generate_controllers(model_path_dir: str, controller_root: str = None):
                             .replace('SCHEMA', schema)
                             .replace('PARAMETER', parameter))
 
-        print("Controllers  Are Generated.")
+        print("Controllers  and views are Generated.")
 
 
 def generate_mapping_configuration(model_path_dir: str, mapping_file_path: str = None):
