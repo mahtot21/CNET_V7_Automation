@@ -22,7 +22,7 @@ def find_schema(table_name: str, server_name: str = 'DESKTOP-9GKJ3L7\CNET_V7', d
         return 'Common'
 
     # For tables "roomfeature", "vouchervalue", "ratecodepackage", and "weekday," append 's' to the table name
-    if table_name.lower() in ['roomfeature', 'vouchervalue', 'ratecodepackage', 'weekday']:
+    if table_name.lower() in ['roomfeature', 'vouchervalue', 'ratecodepackage', 'weekday', 'removeditem']:
         table_name = f'{table_name}s'
 
     # For table "medium," change it to "Media"

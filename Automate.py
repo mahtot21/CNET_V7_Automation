@@ -462,7 +462,7 @@ def generate_controllers(model_path_dir: str, controller_root: str = None):
     entity_controller_implementation_sample = read_sample_code("AbstractController.cs")
 
     # view_controller_implementation_sample = read_sample_code("ViewController.cs")
-    view_controller_implementation_sample = read_sample_code("ViewBaseController.cs")
+    view_controller_implementation_sample = read_sample_code("ViewController.cs")
 
     if entity_controller_implementation_sample == -1 or view_controller_implementation_sample == -1:
         print("File ViewController.cs or EntityController.cs inside 'samples' folder not found!.")
